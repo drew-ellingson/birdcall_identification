@@ -3,3 +3,7 @@ black
 flake8
 pydub
 pandas
+matplotlib
+scipy
+librosa
+numba==0.48 # https://github.com/librosa/librosa/issues/1160

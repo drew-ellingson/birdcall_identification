@@ -4,6 +4,8 @@ import os
 import functools
 import time
 
+source_audio = 'data/train_audio/'
+target_audio = 'data/transformed_audio/'
 
 def timer(func):
     """timing decorator for training and testing methods"""
@@ -23,7 +25,7 @@ def audio_chopper(input_folder, input_file, seg_length):
     song = song.set_frame_rate(44100)  # uniformize, 44.1k is cd standard
     seg_count = math.floor(len(song)/1000 / seg_length)
     output_folder = input_folder[input_folder.rfind('/') + 1:]
-    export_path = os.path.join(os.getcwd(), 'data/transformed_audio/'+output_folder)
+    export_path = os.path.join(os.getcwd(), target_audio + output_folder)
 
     try:
         os.mkdir(export_path)
@@ -39,11 +41,11 @@ def audio_chopper(input_folder, input_file, seg_length):
 
 @timer
 def all_audio_chopper(seg_length):
-    for root, _, filenames in os.walk('data/train_audio'):
+    for root, _, filenames in os.walk(source_audio):
         if not any(map(lambda x: x.endswith('.mp3'), filenames)):
             continue
         bird = root[root.rfind('/') + 1:]
-        if os.path.exists('data/transformed_audio/'+bird):
+        if os.path.exists(target_audio + bird):
             print(f'{bird} was skipped')
             continue
         print(f'Starting on {bird}')
