@@ -1,0 +1,5 @@
+kaggle
+black
+flake8
+pydub
+pandas
