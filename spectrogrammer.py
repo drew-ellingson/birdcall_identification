@@ -5,6 +5,7 @@ import numpy as np
 import os
 import functools
 import time
+import gc
 
 input_folder = "data/transformed_audio/"
 output_folder = "data/spectrograms/"
@@ -80,8 +81,9 @@ def all_make_spec(reload=False):
                             round(time.time() - start_time, 3),
                         )
                     )
+        gc.collect()  # getting killed every ~1000 images. Trying this
     return None
 
 
 if __name__ == "__main__":
-    all_make_spec(reload=False)
+    all_make_spec()
