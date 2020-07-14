@@ -13,13 +13,22 @@ def audio_segment(event, context):
     Args:
         event (dict): Event payload.
         context (google.cloud.functions.Context): Metadata for the event.
+
+        1. Downloads the file to the cloud function instance
+        2. Reads that file into pydub
+        3. Splits the file into 10 second chunks
+        4. Writes the collection of files to the cloud function instance
+        5. Uploads those files to a separate GCS bucket.
     """
+
+    # Getting GCS File
     file = event
     bucket = file["bucket"]
     filename = file["name"]
     bucket = client.get_bucket(bucket)
     blob = bucket.blob(filename)
 
+    # Making a target directory and saving the file to the cloud function instance
     int_folder = filename[: filename.rfind("/")]
 
     temp_store_loc = "/tmp/raw/" + int_folder
@@ -31,6 +40,7 @@ def audio_segment(event, context):
     blob.download_to_filename(audio_data)
     logging.info(f"Raw Audio filepath: {audio_data}")
 
+    # Reading the function into pydub and splitting into 10s chunks
     song = AudioSegment.from_mp3(audio_data)
     song = song.set_channels(1)  # enforce mono rather than stereo
     song = song.set_frame_rate(44100)  # uniformize, 44.1k is cd standard
@@ -38,6 +48,7 @@ def audio_segment(event, context):
     seg_length = 10  # hardcoded for cloud function. Maybe env var is the way to go?
     seg_count = math.floor(len(song) / 1000 / seg_length)
 
+    # Saving the resulting files to a new location on the cloud function instance
     processed_file_loc = "/tmp/processed/" + int_folder
     logging.info(f"Writing processed file to location: {processed_file_loc}")
 
@@ -61,6 +72,7 @@ def audio_segment(event, context):
         segment.export(export_name, format="wav")
         logging.info(f"Processed export file #{i} in location: {export_path}")
 
+        # Uploading the files to a separate GCS bucket.
         gcs_export_name = export_name.replace("/tmp/processed/", "")
         logging.info(f"Exporting to GCS location: {gcs_export_name}")
 

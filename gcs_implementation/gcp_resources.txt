@@ -1,0 +1,8 @@
+# GCS Buckets
+birdcall-id-raw-mp3s
+birdcall-id-processed-mp3s
+birdcall-id-spectrograms 
+
+# Cloud Functions
+birdcall-id-mp3-process
+birdcall-id-make-spectrogram
